@@ -3,11 +3,12 @@ import argparse
 from pathlib import Path
 import xarray as xr
 
-def extract_metadata(folder_path, output_file):
+def extract_metadata(file_path, output_file):
     variables_to_ignore = {'time', 'rotated_pole', 'rlon', 'rlat', 'lon_bnds',
                            'lon', 'lat_bnds', 'lat', 'height', 'height_2m',
                            'height_10m', 'time_bnds', 'pressure', 'depth', 
-                           'depth_bnds', 'clon', 'clon_bnds', 'clat', 'clat_bnds'}
+                           'depth_bnds', 'clon', 'clon_bnds', 'clat',
+                           'clat_bnds', 'height_bnds'}
     processed_variables = set()
     # Create or open the output file in write mode
     with open(output_file, 'w', newline='') as csvfile:
@@ -29,8 +30,9 @@ def extract_metadata(folder_path, output_file):
             raise ValueError("Invalid input. Please provide a valid file or folder path.")
 
         # Loop through all files in the specified folder
-        for file_path in Path(folder_path).glob('*.nc'):
-            print(f"Processing file: {file_path.name}")
+        for file_path in files_to_process:
+            file_name = Path(file_path).name if isinstance(file_path, Path) else Path(file_path).name
+            print(f"Processing file: {file_name}")
 
             # Open the netCDF file
             with xr.open_dataset(file_path) as ds:
@@ -49,7 +51,7 @@ def extract_metadata(folder_path, output_file):
                         units = variable.attrs.get('units', '-') if 'units' in variable.attrs else '-'
 
                         # Add the row to the list
-                        rows.append([file_path.name, var_name, standard_name, long_name, units])
+                        rows.append([file_name, var_name, standard_name, long_name, units])
 
                         # Mark the variable as processed in the dataset attributes
                         processed_variables.add(var_name)
@@ -66,12 +68,12 @@ def extract_metadata(folder_path, output_file):
 
 def main():
     parser = argparse.ArgumentParser(description='Extract metadata from netCDF files.')
-    parser.add_argument('folder_path', type=str, help='Path to the netCDF files folder')
-    parser.add_argument('--output_file', type=str, default='output_metadata.csv', help='Output CSV file name')
+    parser.add_argument('file_path', type=str, help='Path to the netCDF files folder')
+    parser.add_argument('-o', '--output_file', type=str, default='output_metadata.csv', help='Output CSV file name')
 
     args = parser.parse_args()
 
-    extract_metadata(args.folder_path, args.output_file)
+    extract_metadata(args.file_path, args.output_file)
 
 if __name__ == "__main__":
     main()
