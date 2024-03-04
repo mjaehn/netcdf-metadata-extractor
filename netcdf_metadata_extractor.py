@@ -8,7 +8,7 @@ def extract_metadata(file_path, output_file):
                            'lon', 'lat_bnds', 'lat', 'height', 'height_2m',
                            'height_10m', 'time_bnds', 'pressure', 'depth', 
                            'depth_bnds', 'clon', 'clon_bnds', 'clat',
-                           'clat_bnds', 'height_bnds'}
+                           'clat_bnds', 'height_bnds', 'depth_2', 'depth_2_bnds'}
     processed_variables = set()
     # Create or open the output file in write mode
     with open(output_file, 'w', newline='') as csvfile:
