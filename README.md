@@ -53,8 +53,8 @@ The output CSV file is sorted by the variable name.
 
 ## Notes
 
-    The script excludes certain variables (e.g., dimensions, coordinates) specified in the code.
-    If a variable has already been processed for a file, it is skipped to avoid duplicates.
+The script excludes certain variables (e.g., dimensions, coordinates) specified in the code.
+If a variable has already been processed for a file, it is skipped to avoid duplicates.
 
 ## License
 
