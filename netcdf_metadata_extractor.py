@@ -6,6 +6,7 @@ import xarray as xr
 def extract_metadata(file_path, output_file):
     variables_to_ignore = {'time', 'rotated_pole', 'rlon', 'rlat', 'lon_bnds',
                            'lon', 'lat_bnds', 'lat', 'HFL', 'height', 'height_2', 
+                           'height_3', 'height_3_bnds',
                            'height_2m', 'height_10m', 'time_bnds', 'pressure', 
                            'depth', 'depth_bnds', 'clon', 'clon_bnds', 'clat',
                            'clat_bnds', 'height_bnds', 'depth_2', 'depth_2_bnds'}
