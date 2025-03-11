@@ -2,12 +2,37 @@ import csv
 import argparse
 from pathlib import Path
 import xarray as xr
+from datetime import timedelta
+
+def ns_to_iso_duration(ns):
+    seconds = ns / 1e9
+    delta = timedelta(seconds=seconds)
+    days = delta.days
+    seconds = delta.seconds
+    hours, remainder = divmod(seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    
+    duration = 'P'
+    if days > 0:
+        duration += f'{days}D'
+    if hours > 0 or minutes > 0 or seconds > 0:
+        duration += 'T'
+        if hours > 0:
+            duration += f'{hours}H'
+        if minutes > 0:
+            duration += f'{minutes}M'
+        if seconds > 0:
+            duration += f'{seconds}S'
+    
+    return duration
 
 def extract_metadata(file_path, output_file):
     variables_to_ignore = {'time', 'rotated_pole', 'rlon', 'rlat', 'lon_bnds',
                            'lon', 'lat_bnds', 'lat', 'HFL', 'height', 'height_2', 
                            'height_3', 'height_3_bnds',
                            'height_2m', 'height_10m', 'time_bnds', 'pressure', 
+                           'plev', 'plev_bnds', 'plev_2', 'plev_2_bnds', 'plev_3',
+                           'plev_3_bnds', 
                            'depth', 'depth_bnds', 'clon', 'clon_bnds', 'clat',
                            'clat_bnds', 'height_bnds', 'depth_2', 'depth_2_bnds'}
     processed_variables = set()
@@ -17,7 +42,7 @@ def extract_metadata(file_path, output_file):
         csv_writer = csv.writer(csvfile)
 
         # Write the header row
-        csv_writer.writerow(['File', 'Variable', 'Standard Name', 'Long Name', 'Units'])
+        csv_writer.writerow(['File', 'Variable', 'Standard Name', 'Long Name', 'Units', 'Time Step'])
 
         # Create a list to store rows
         rows = []
@@ -37,6 +62,17 @@ def extract_metadata(file_path, output_file):
 
             # Open the netCDF file
             with xr.open_dataset(file_path) as ds:
+                # Calculate the time step
+                if 'time' in ds.variables:
+                    time_var = ds.variables['time']
+                    if len(time_var) > 1:
+                        time_step_ns = (time_var[1] - time_var[0]).item()
+                        time_step = ns_to_iso_duration(time_step_ns)
+                    else:
+                        time_step = 'N/A'
+                else:
+                    time_step = 'N/A'
+
                 # Loop through variables
                 for var_name in ds.variables:
                     if var_name not in variables_to_ignore:
@@ -52,7 +88,7 @@ def extract_metadata(file_path, output_file):
                         units = variable.attrs.get('units', '-') if 'units' in variable.attrs else '-'
 
                         # Add the row to the list
-                        rows.append([file_name, var_name, standard_name, long_name, units])
+                        rows.append([file_name, var_name, standard_name, long_name, units, time_step])
 
                         # Mark the variable as processed in the dataset attributes
                         processed_variables.add(var_name)
@@ -78,4 +114,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
