@@ -42,7 +42,7 @@ def extract_metadata(file_path, output_file):
         csv_writer = csv.writer(csvfile)
 
         # Write the header row
-        csv_writer.writerow(['File', 'Variable', 'Standard Name', 'Long Name', 'Units', 'Time Step'])
+        csv_writer.writerow(['Variable', 'File', 'Frequency', 'Standard Name', 'Long Name', 'Units'])
 
         # Create a list to store rows
         rows = []
@@ -88,7 +88,7 @@ def extract_metadata(file_path, output_file):
                         units = variable.attrs.get('units', '-') if 'units' in variable.attrs else '-'
 
                         # Add the row to the list
-                        rows.append([file_name, var_name, standard_name, long_name, units, time_step])
+                        rows.append([var_name, file_name, time_step, standard_name, long_name, units])
 
                         # Mark the variable as processed in the dataset attributes
                         processed_variables.add(var_name)
