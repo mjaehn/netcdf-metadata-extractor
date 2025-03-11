@@ -42,8 +42,9 @@ python netcdf_metadata_extractor.py /path/to/netcdf/file.nc
 
 The script generates a CSV file containing the following columns:
 ```
-    File: The name of the NetCDF file.
     Variable: The variable name within the NetCDF file.
+    File Name: The name of the NetCDF file.
+    Time Step: Output frequency step.
     Standard Name: The standard name attribute of the variable.
     Long Name: The long name attribute of the variable.
     Units: The units attribute of the variable. If not available, it is set to "-".
